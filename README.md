@@ -90,6 +90,24 @@ db.alunos.insert({
     }
 })
 
+db.alunos.insert({
+    nome : "André",
+    data_nascimento : new Date(1991, 01, 25),
+    notas : [ 7, 5, 9, 4.5 ],
+    curso : {
+        nome : "Matemática"
+    }
+})
+
+db.alunos.insert({
+    nome : "Lúcia",
+    data_nascimento : new Date(1994, 07, 17),
+    notas : [ 9, 8.5, 10 ],
+    curso : {
+        nome : "Matemática"
+    }
+})
+
 ```
 
 ## Listando dados
@@ -111,6 +129,8 @@ db.alunos.remove( {
 
 https://docs.mongodb.com/manual/reference/method/db.collection.find/
 
+* find() - Retorna todos
+* findOne() - Retorna apenas a primeira ocorrência
 
 ```
 db.alunos.find(
@@ -156,6 +176,44 @@ db.alunos.find({
     "data_de_nascimento" : new Date(1994, 02, 26)
 })
 ```
+
+
+### Buscando e limitando registros
+
+Busca com notas maiores ou iguais a 5
+
+```
+db.alunos.find({
+    notas: { $gt : 5 }
+})
+```
+
+### Ordenando
+
+ASC
+
+```
+db.alunos.find().sort({
+    "nome": 1
+})
+```
+
+DESC
+
+```
+db.alunos.find().sort({
+    "nome": -1
+})
+```
+
+## Limitando
+
+db.alunos.find().sort({
+    "nome": 1
+}).limit(3)
+
+
+
 ## Atualização completa e parcial de documentos
 
 O update funciona pedindo a condição que queremos modificar e a condição que desejamos.
@@ -226,4 +284,44 @@ db.alunos.update(
         }
     }
 )
+```
+
+## Importando arquivos
+
+mongoimport -c alunos --jsonArray < alunos.json
+
+## Endereços e posicionamentos
+
+```
+db.alunos.createIndex({
+    localizacao : "2dsphere"
+})
+
+db.alunos.aggregate([
+{
+    $geoNear : {
+        near : {
+            coordinates: [-23.5640265, -46.6527128],
+            type : "Point"
+        },
+        distanceField : "distancia.calculada",
+        spherical : true
+    }
+}
+])
+
+db.alunos.aggregate([
+{
+    $geoNear : {
+        near : {
+            coordinates: [-23.5640265, -46.6527128],
+            type : "Point"
+        },
+        distanceField : "distancia.calculada",
+        spherical : true,
+        num : 4
+    }
+},
+{ $skip :1 }
+])
 ```
