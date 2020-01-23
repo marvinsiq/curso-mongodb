@@ -80,6 +80,16 @@ db.alunos.insert({
     ] 
 })
 
+
+db.alunos.insert({
+    nome : "Fernando",
+    data_nascimento : new Date(1994, 03, 26),
+    notas : [ 10, 4.5, 7],
+    curso : {
+        nome : "Sistema de informação"
+    }
+})
+
 ```
 
 ## Listando dados
@@ -97,7 +107,7 @@ db.alunos.remove( {
 })
 ```
 
-## Busca de dados
+## Buscando de dados
 
 https://docs.mongodb.com/manual/reference/method/db.collection.find/
 
@@ -147,3 +157,73 @@ db.alunos.find({
 })
 ```
 ## Atualização completa e parcial de documentos
+
+O update funciona pedindo a condição que queremos modificar e a condição que desejamos.
+O primeiro parametro é a busca, e o segundo é o que queremos atualizar.
+
+Se não usarmos operadores, estaremos dizendo para substituir todo o documento. Para fazer um update que não faça um simples cambio utilizamos o operador "set" 
+
+
+```
+db.alunos.update(
+    {"curso.nome" : "Sistema de informação"},
+    {
+        $set : {
+            "curso.nome" : "Sistemas de informação"
+        }
+    }    
+)
+
+
+db.alunos.update(
+    {"curso.nome" : "Sistemas de informação"},
+    {
+        $set : {
+            "curso.nome" : "Sistemas de Informação"
+        }
+    }
+)
+```
+
+
+O update, por padrão, troca apenas a primeira ocorrencia encontrada. Para que ele entenda que isso tem que ser feito para todas é preciso passar um `multi : true`, que, por padrão é false.
+
+```
+db.alunos.update(
+    {"curso.nome" : "Sistemas de informação"},
+    {
+        $set : 
+           {"curso.nome" : "Sistemas de Informação"}  
+        }, 
+      {
+        multi : true 
+      }
+)
+```
+
+
+Usando uma Array e utilizando o $push empurramos algo dentro da Array. Escreveremos $push, colocaremos o campo "notas" e dentro dele o valor da nota. Teremos o seguinte:
+
+```
+db.alunos.update(
+    {"_id" : ObjectId("56cb0002b6d75ec12f75d3b5")},
+    {
+        $push : {
+            notas : 8.5
+        }    
+    }
+)
+```
+
+Para introduzir mais de uma valor com $push
+
+```
+db.alunos.update(
+    {"_id" : ObejctId("56cb0139b6d75ec12f75d3b6")},
+    {
+        $push : {
+            "notas" : {$each : [8.5, 3] }
+        }
+    }
+)
+```
